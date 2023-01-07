@@ -1,1 +1,2 @@
-# Store-Managment-System
+# IEP-projekat
+Projekat iz Infrastrukture za elektronsko poslovanje

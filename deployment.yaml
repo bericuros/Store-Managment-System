@@ -1,0 +1,97 @@
+version: '3'
+
+services:
+  authenticationDatabase:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    volumes:
+      - dataAuthenticationDatabase:/var/lib/mysql
+    networks:
+      - netAuthenticationDatabase
+  adminer:
+    image: adminer
+    ports:
+      - '8080:8080'
+    networks:
+      - netAuthenticationDatabase
+      - netStoreDatabase
+  authDBMigration:
+    image: authdbmigration
+    environment:
+      - DATABASE_URL=authenticationDatabase
+    networks:
+      - netAuthenticationDatabase
+  authentication:
+    image: authentication
+    environment:
+      - DATABASE_URL=authenticationDatabase
+    ports:
+      - '5002:5002'
+    networks:
+      - netAuthenticationDatabase
+  storeDatabase:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '5001:3306'
+    volumes:
+      - dataStoreDatabase:/var/lib/mysql
+    networks:
+      - netStoreDatabase
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - netRedis
+  storeDBMigration:
+    image: storedbmigration
+    environment:
+      - DATABASE_URL=storeDatabase
+    networks:
+      - netStoreDatabase
+  storeadmin:
+    image: storeadmin
+    environment:
+      - DATABASE_URL=storeDatabase
+    ports:
+      - '5003:5003'
+    networks:
+      - netStoreDatabase
+  storecustomer:
+    image: storecustomer
+    environment:
+      - DATABASE_URL=storeDatabase
+    ports:
+      - '5004:5004'
+    networks:
+      - netStoreDatabase
+  storewarehouse:
+    image: storewarehouse
+    environment:
+      - REDIS_URL=redis
+    ports:
+      - '5006:5006'
+    networks:
+      - netRedis
+  storedaemon:
+    image: storedaemon
+    environment:
+      - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
+    networks:
+      - netStoreDatabase
+      - netRedis
+
+volumes:
+  dataAuthenticationDatabase:
+  dataStoreDatabase:
+
+networks:
+  netAuthenticationDatabase:
+  netStoreDatabase:
+  netRedis:
